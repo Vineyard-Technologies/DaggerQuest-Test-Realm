@@ -51,6 +51,21 @@ foreach ($item in $rootItems) {
     }
 }
 
+# Find and update all CNAME files to point to test subdomain
+Write-Host "Updating CNAME files..." -ForegroundColor Magenta
+$cnameFiles = Get-ChildItem -Path $destinationRepo -Name "CNAME" -Recurse -Force
+foreach ($cnameFile in $cnameFiles) {
+    $cnameFilePath = Join-Path $destinationRepo $cnameFile
+    Write-Host "Updating CNAME file: $cnameFilePath" -ForegroundColor Cyan
+    Set-Content -Path $cnameFilePath -Value "test.daggerquest.com" -Force
+}
+
+if ($cnameFiles.Count -eq 0) {
+    Write-Host "No CNAME files found" -ForegroundColor Yellow
+} else {
+    Write-Host "Updated $($cnameFiles.Count) CNAME file(s)" -ForegroundColor Green
+}
+
 # Normalize line endings after copy to prevent "modified but no content changes" issues
 Write-Host "Normalizing line endings..." -ForegroundColor Magenta
 Set-Location $destinationRepo
