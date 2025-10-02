@@ -1,4 +1,6 @@
 User-agent: *
-Disallow:
+Disallow: /
 
+# This is a test environment - please visit the main site instead
+# Main site: https://DaggerQuest.com
 Sitemap: https://DaggerQuest.com/sitemap.xml
