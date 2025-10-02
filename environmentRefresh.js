@@ -3,10 +3,16 @@
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
+import { fileURLToPath } from 'url';
 
-// Configuration
-const sourceRepo = 'C:\\Users\\Andrew\\Documents\\GitHub\\DaggerQuest.com';
-const destinationRepo = 'C:\\Users\\Andrew\\Documents\\GitHub\\DaggerQuest-Test-Realm';
+// Configuration - determine paths dynamically
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// This script is in the root of DaggerQuest-Test-Realm, so go up one level to find sibling repos
+const parentDir = path.dirname(__dirname);
+const sourceRepo = path.join(parentDir, 'DaggerQuest.com');
+const destinationRepo = __dirname; // Current directory is the destination repo
 const skipItems = ['.git', 'README.md', 'readmeimage.webp'];
 
 console.log(`Starting copy operation from ${sourceRepo} to ${destinationRepo}`);
@@ -99,6 +105,30 @@ if (cnameFiles.length === 0) {
     console.log('\x1b[33mNo CNAME files found\x1b[0m');
 } else {
     console.log(`\x1b[32mUpdated ${cnameFiles.length} CNAME file(s)\x1b[0m`);
+}
+
+// Clean up files/folders that don't exist in source repo
+console.log('\x1b[35mCleaning up extra files/folders...\x1b[0m');
+const sourceRootItems = fs.readdirSync(sourceRepo, { withFileTypes: true });
+const destRootItems = fs.readdirSync(destinationRepo, { withFileTypes: true });
+
+// Get list of items that should exist (from source + skip items + this script)
+const expectedItems = new Set();
+sourceRootItems.forEach(item => expectedItems.add(item.name));
+skipItems.forEach(item => expectedItems.add(item));
+expectedItems.add('environmentRefresh.js'); // Don't delete this script
+
+for (const item of destRootItems) {
+    if (!expectedItems.has(item.name)) {
+        const itemPath = path.join(destinationRepo, item.name);
+        console.log(`\x1b[31mRemoving extra item: ${item.name}\x1b[0m`);
+        
+        if (item.isDirectory()) {
+            fs.rmSync(itemPath, { recursive: true, force: true });
+        } else {
+            fs.unlinkSync(itemPath);
+        }
+    }
 }
 
 // Normalize line endings after copy to prevent "modified but no content changes" issues

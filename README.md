@@ -10,7 +10,7 @@
 
 There can only be one GitHub Pages site per repository, so this repository was made to host the Test Realm.
 
-The website is stripped down and all the links point to their equivalent pages on [DaggerQuest.com](https://DaggerQuest.com/).
+`environmentRefresh.js` can be used to refresh this test environment to match the production environment, provided that repository is locally cloned as well.
 
 The Test Realm may be updated and/or wiped without warning.
 
