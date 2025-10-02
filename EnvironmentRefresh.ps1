@@ -51,4 +51,9 @@ foreach ($item in $rootItems) {
     }
 }
 
+# Normalize line endings after copy to prevent "modified but no content changes" issues
+Write-Host "Normalizing line endings..." -ForegroundColor Magenta
+Set-Location $destinationRepo
+git add --renormalize . 2>$null
+
 Write-Host "Copy operation completed successfully!" -ForegroundColor Green
